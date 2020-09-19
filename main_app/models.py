@@ -4,9 +4,10 @@ from datetime import date
 from dateutil.relativedelta import relativedelta, MO
 from sortedm2m.fields import SortedManyToManyField
 from django.contrib.auth.models import User
+from django.conf import settings
 
 # Create your models here.
-class Pill:
+class Pill(models.Model):
   name = models.CharField(max_length=75)
   dosage = models.CharField(max_length=50)
   directions = models.TextField(max_length=250)
@@ -14,11 +15,12 @@ class Pill:
   qty = models.IntegerField()  
   refills = models.IntegerField()  
   date_prescribed = models.DateField()
+  # qty_remaining = qty
 
   def __str__(self):
     return self.name
   
-class EmergencyContact:
+class EmergencyContact(models.Model):
   first_name = models.CharField(max_length=50)
   last_name = models.CharField(max_length=50)
   phone = models.CharField(max_length=25)
@@ -32,7 +34,7 @@ class EmergencyContact:
   def __str__(self):
     return self.name
   
-class Admin:
-  admin_user = models.ForeignKey(User, on_delete=models.CASCADE)
-  users_list = models.ManyToManyField(User)
+# class Admin(models.Model):
+#   admin_user = models.ForeignKey(settings.AUTH_USER_MODEL)
+#   users_list = models.ManyToManyField(User)
   
