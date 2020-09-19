@@ -10,11 +10,11 @@
             <span class="card-title">{{ pill.name }}</span>
             <p>Dosage: {{ pill.dosage }}</p>
             <p>Directions: {{ pill.directions }}</p>
-            <p>Prescribing Doctor: {{ pill.presicribing_doctor }}</p>
+            <p>Prescribing Doctor: {{ pill.prescribing_doctor }}</p>
             {% comment %} {% if pill.qty_remaining > 3 %}
               <p>Quantity Left: {{ pill.qty_remaining }}</p>
             {% else %}
-              <p>You are running low on this medication! you have {{ pill.refills }} refills left.</p>
+              <p>You are running low on this medication! you have {{ pill.refills }}  left.</p>
             {% endif %} {% endcomment %}
         </div>
     </div>

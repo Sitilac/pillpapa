@@ -7,6 +7,13 @@ from django.contrib.auth.models import User
 from django.conf import settings
 
 # Create your models here.
+
+DOSE = (
+  ('M', 'Morning'),
+  ('A', 'Afternoon'),
+  ('N', 'Night')
+)
+
 class Pill(models.Model):
   name = models.CharField(max_length=75)
   dosage = models.CharField(max_length=50)
@@ -19,6 +26,9 @@ class Pill(models.Model):
 
   def __str__(self):
     return self.name
+  
+  def get_absolute_url(self):
+    return reverse('detail', kwargs={'pill_id': self.id})
   
 class EmergencyContact(models.Model):
   first_name = models.CharField(max_length=50)
@@ -34,6 +44,19 @@ class EmergencyContact(models.Model):
   def __str__(self):
     return self.name
   
+class Dosing(models.Model):
+  date = models.DateField()
+  dose = models.CharField(
+    max_length=1,
+    choices= DOSE,
+    default=DOSE[0][0]
+  )
+  pill = models.ForeignKey(Pill, on_delete=models.CASCADE)
+  def __str__(self):
+    return f"{self.get_dose_display()} on {self.date}"
+  class Meta:
+    ordering = ['-date']
+
 # class Admin(models.Model):
 #   admin_user = models.ForeignKey(settings.AUTH_USER_MODEL)
 #   users_list = models.ManyToManyField(User)
