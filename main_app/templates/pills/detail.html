@@ -11,5 +11,9 @@
     <p>Prescribing Doctor: {{ pill.prescribing_doctor }}</p>
   </div>
 </div>
+<div class="card-action">
+  <a href="{% url 'pills_update' pill.id %}">Edit</a>
+  <a href="{% url 'pills_delete' pill.id %}">Delete</a>
+</div>
 
 {% endblock %}

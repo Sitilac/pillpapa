@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import *
 
 # Create your views here.
@@ -17,3 +17,16 @@ def pills_index(request):
 def pill_detail(request, pill_id):
   pill = Pill.objects.get(id=pill_id)
   return render(request, 'pills/detail.html', { 'pill': pill })
+
+class PillCreate(CreateView):
+  model = Pill
+  fields = '__all__'
+
+class PillUpdate(UpdateView):
+  model = Pill
+  fields = '__all__'
+
+class PillDelete(DeleteView):
+  model = Pill
+  success_url = '/pills/'
+

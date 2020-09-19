@@ -20,6 +20,9 @@ class Pill(models.Model):
   def __str__(self):
     return self.name
   
+  def get_absolute_url(self):
+    return reverse('detail', kwargs={'pill_id': self.id})
+  
 class EmergencyContact(models.Model):
   first_name = models.CharField(max_length=50)
   last_name = models.CharField(max_length=50)
