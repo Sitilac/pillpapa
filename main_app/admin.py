@@ -5,4 +5,5 @@ from .models import *
 
 admin.site.register(Pill)
 admin.site.register(Dosing)
-# admin.site.register(EmergencyContact)
+admin.site.register(EmergencyContact)
+admin.site.register(Patient)
