@@ -4,13 +4,13 @@ from django.contrib.auth.models import User
 from django import forms
 from .models import Dosing, Patient, EmergencyContact
 
-class UserForm(UserCreationForm):
-  first_name = forms.CharField(max_length=50, required=True)
-  last_name = forms.CharField(max_length=50, required=True)
-  email = forms.CharField(max_length=50, required=True)
-  class Meta:
-    model = User
-    fields = ["username", "password1", "password2", "first_name", "last_name", "email"]
+# class UserForm(UserCreationForm):
+#   first_name = forms.CharField(max_length=50, required=True)
+#   last_name = forms.CharField(max_length=50, required=True)
+#   email = forms.CharField(max_length=50, required=True)
+#   class Meta:
+#     model = User
+#     fields = ["username", "password1", "password2"]
 
 class DosingForm(ModelForm):
   class Meta:
@@ -20,7 +20,7 @@ class DosingForm(ModelForm):
 class PatientForm(ModelForm):
   class Meta:
     model = Patient
-    fields = ['phone_num','room_number']
+    fields = ["first_name", "last_name", "email",'dob', 'phone_num','room_number']
     
 class ICEForm(ModelForm):
   class Meta:

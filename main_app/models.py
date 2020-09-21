@@ -17,23 +17,30 @@ DOSE = (
 )
 class Patient(models.Model):
   user = models.OneToOneField(User, on_delete=models.CASCADE)
+  first_name = models.CharField(max_length=25)
+  last_name = models.CharField(max_length=25)
+  email = models.CharField(max_length=25)
   phone_num= models.CharField(max_length=25)
   room_number = models.CharField(max_length=5, blank=True)
+  dob = models.DateField(null=True)
   points = models.IntegerField(default=0)
   
   @property
   def name(self):
-    return "%s %s" % ( self.user.first_name, self.user.last_name )
+    return "%s %s" % ( self.first_name, self.last_name )
   
   def __str__(self):
     return self.name
   
+  def get_absolute_url(self):
+    return reverse('ICE_create')
+  
 
   
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-  if created:
-    Patient.objects.create(user=instance)
+# @receiver(post_save, sender=User)
+# def create_user_profile(sender, instance, created, **kwargs):
+#   if created:
+#     Patient.objects.create(user=instance)
 
 
 class Pill(models.Model):
