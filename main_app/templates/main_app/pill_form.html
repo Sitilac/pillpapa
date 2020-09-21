@@ -7,14 +7,25 @@
     <h1>Add Medication</h1>
   {% endif %}
 
-  <!-- Leaving the action empty makes the form post to the same url used to display it -->
-  <form action="" method="post">
-    <!-- Django requires the following for security purposes -->
-    {% csrf_token %}
-    <table>
-      <!-- Render the inputs inside of <tr>s & <td>s -->
-      {{ form.as_table }}
-    </table>
-    <input type="submit" value="Submit!" class="btn">
-  </form>
+<!-- Leaving the action empty makes the form post to the same url used to display it -->
+<form action="" method="post">
+  <!-- Django requires the following for security purposes -->
+  {% csrf_token %}
+  <table>
+    <!-- Render the inputs inside of <tr>s & <td>s -->
+    {{ form.as_table }}
+  </table>
+  <input type="submit" value="Submit!" class="btn">
+</form>
+<script>
+  const dateEl = document.getElementById('id_date_prescribed');
+  M.Datepicker.init(dateEl, {
+    format: 'yyyy-mm-dd',
+    // defaultDate: new Date(),
+    // setDefaultDate: true,
+    autoClose: true
+  });
+  const selectEl = document.getElementById('id_dose');
+  M.FormSelect.init(selectEl);
+</script>
 {% endblock %}
