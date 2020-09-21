@@ -21,11 +21,6 @@ class Patient(models.Model):
   room_number = models.CharField(max_length=5, blank=True)
   points = models.IntegerField(default=0)
 
-# def create_user_profile(sender, instance, created, **kwargs):
-#   if created:
-#     Patient.objects.create(userName=instance)
-
-# post_save.connect(create_user_profile, sender=User)
   
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

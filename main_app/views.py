@@ -38,7 +38,8 @@ class PillCreate(CreateView):
 
   def form_valid(self, form):
     # Assign the logged in user (self.request.user)
-    form.instance.user = self.request.user 
+    form.instance.user = self.request.user
+    form.instance.patient = self.request.user.patient
     # Let the CreateView do its job as usual
     return super().form_valid(form)
   
@@ -57,7 +58,7 @@ def signup(request):
   if request.method == 'POST':
     # This is how to create a 'user' form object
     # that includes the data from the browser
-    form = UserForm(request.POST,)
+    form = UserForm(request.POST)
     if form.is_valid(): 
       user = form.save()
       # This will add the user to the database
