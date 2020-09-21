@@ -26,8 +26,10 @@ def pill_detail(request, pill_id):
   
 def patient_detail(request): 
   patient = request.user.patient
+  ICE = EmergencyContact.objects.get(patient_id=patient.id)
   return render(request, 'patients/detail.html',{
-    'patient':patient
+    'patient':patient, 
+    'ICE':ICE,
   })
 
 def add_dosing(request, pill_id):
@@ -37,6 +39,20 @@ def add_dosing(request, pill_id):
     new_dosing.pill_id = pill_id
     new_dosing.save()
   return redirect('detail', pill_id=pill_id)
+
+class PatientCreate(CreateView):
+  model = Patient
+  fields = ["first_name", "last_name", "email", 'dob', 'phone_num', 'room_number']
+  
+  def form_valid(self, form):
+    # Assign the logged in user (self.request.user)
+    form.instance.user = self.request.user
+    form.instance.patient = self.request.user.patient
+    self.request.user.first_name = form.instance.user.first_name
+    self.request.user.last_name = form.instance.user.last_name
+    self.request.user.email = form.instance.user.email
+    # Let the CreateView do its job as usual
+    return super().form_valid(form)
 
 class ICECreate(CreateView):
   model = EmergencyContact
@@ -76,17 +92,17 @@ def signup(request):
   if request.method == 'POST':
     # This is how to create a 'user' form object
     # that includes the data from the browser
-    form = UserForm(request.POST)
+    form = UserCreationForm(request.POST)
     if form.is_valid(): 
       user = form.save()
       # This will add the user to the database
       # This is how we log a user in via code
       login(request, user)
-      return redirect('ICE_create')
+      return redirect('patient_create')
     else:
       error_message = 'Invalid sign up - try again'
   # A bad POST or a GET request, so render signup.html with an empty form
-  form = UserForm()
+  form = UserCreationForm()
   patient = PatientForm()
   #emergency_contact = ICEForm()
   context = {
