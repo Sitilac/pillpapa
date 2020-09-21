@@ -41,6 +41,7 @@ class PillCreate(CreateView):
     form.instance.user = self.request.user 
     # Let the CreateView do its job as usual
     return super().form_valid(form)
+  
 
 class PillUpdate(UpdateView):
   model = Pill
@@ -52,19 +53,14 @@ class PillDelete(DeleteView):
   
 def signup(request):
   error_message = ''
+  flag = 0
   if request.method == 'POST':
     # This is how to create a 'user' form object
     # that includes the data from the browser
     form = UserForm(request.POST,)
-    patient = PatientForm(request.POST)
-    #emergency_contact = ICEForm(request.POST)
-    print(f'form:{form.is_valid()} patient: {patient.is_valid()} ')
-    print(f'form:{form} patient: {patient} ')
-    if form.is_valid(): #and patient.is_valid()
-      # This will add the user to the database
-      patient.save()
-      #emergency_contact.save()
+    if form.is_valid(): 
       user = form.save()
+      # This will add the user to the database
       # This is how we log a user in via code
       login(request, user)
       return redirect('index')
@@ -77,7 +73,8 @@ def signup(request):
   context = {
     'form': form, 
     'error_message': error_message,
-    'patient':patient,
   }
   return render(request, 'registration/signup.html', context)
+
+
 

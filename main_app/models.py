@@ -15,6 +15,23 @@ DOSE = (
   ('A', 'Afternoon'),
   ('N', 'Night')
 )
+class Patient(models.Model):
+  user = models.OneToOneField(User, on_delete=models.CASCADE)
+  phone_num= models.CharField(max_length=25)
+  room_number = models.CharField(max_length=5, blank=True)
+  points = models.IntegerField(default=0)
+
+# def create_user_profile(sender, instance, created, **kwargs):
+#   if created:
+#     Patient.objects.create(userName=instance)
+
+# post_save.connect(create_user_profile, sender=User)
+  
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+  if created:
+    Patient.objects.create(user=instance)
+
 
 class Pill(models.Model):
   name = models.CharField(max_length=75)
@@ -27,6 +44,7 @@ class Pill(models.Model):
   # qty_remaining = qty
   
   user = models.ForeignKey(User, on_delete=models.CASCADE)
+  patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
 
   def __str__(self):
     return self.name
@@ -34,17 +52,7 @@ class Pill(models.Model):
   def get_absolute_url(self):
     return reverse('detail', kwargs={'pill_id': self.id})
 
-class Patient(models.Model):
-  user = models.ForeignKey(User, on_delete=models.CASCADE)
-  phone_num= models.CharField(max_length=25)
-  room_number = models.CharField(max_length=5, blank=True)
-  points = models.IntegerField(default=0)
-  medication = models.ForeignKey(Pill, on_delete=models.CASCADE)
-  
-@receiver(post_save, sender=User)
-def create_user_patient(sender, instance, created, **kwargs):
-  if created:
-    Patient.objects.create(user=instance)
+
   
 class EmergencyContact(models.Model):
   first_name = models.CharField(max_length=50)
