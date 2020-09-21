@@ -64,7 +64,7 @@ class PillCreate(CreateView):
 
 class PillUpdate(UpdateView):
   model = Pill
-  fields = '__all__'
+  fields = ['name', 'dosage', 'directions', 'prescribing_doctor', 'qty', 'refills', 'date_prescribed']
 
 class PillDelete(DeleteView):
   model = Pill
