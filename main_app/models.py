@@ -99,3 +99,9 @@ class Dosing(models.Model):
 #   admin_user = models.ForeignKey(settings.AUTH_USER_MODEL)
 #   users_list = models.ManyToManyField(User)
   
+class Photo(models.Model):
+  url = models.CharField(max_length=200)
+  patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+  
+  def __str__(self):
+    return f"Photo for patient: @{self.url}"
