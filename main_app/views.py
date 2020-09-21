@@ -23,6 +23,12 @@ def pill_detail(request, pill_id):
   return render(request, 'pills/detail.html', {
      'pill': pill, 'dosing_form':dosing_form
   })
+  
+def patient_detail(request): 
+  patient = request.user.patient
+  return render(request, 'patients/detail.html',{
+    'patient':patient
+  })
 
 def add_dosing(request, pill_id):
   form = DosingForm(request.POST)
@@ -31,6 +37,18 @@ def add_dosing(request, pill_id):
     new_dosing.pill_id = pill_id
     new_dosing.save()
   return redirect('detail', pill_id=pill_id)
+
+class ICECreate(CreateView):
+  model = EmergencyContact
+  fields = ['first_name', 'last_name','email', 'phone']
+  
+  def form_valid(self, form):
+    # Assign the logged in user (self.request.user)
+    form.instance.user = self.request.user
+    form.instance.patient = self.request.user.patient
+    # Let the CreateView do its job as usual
+    return super().form_valid(form)
+  
 
 class PillCreate(CreateView):
   model = Pill
@@ -64,7 +82,7 @@ def signup(request):
       # This will add the user to the database
       # This is how we log a user in via code
       login(request, user)
-      return redirect('index')
+      return redirect('ICE_create')
     else:
       error_message = 'Invalid sign up - try again'
   # A bad POST or a GET request, so render signup.html with an empty form

@@ -20,6 +20,14 @@ class Patient(models.Model):
   phone_num= models.CharField(max_length=25)
   room_number = models.CharField(max_length=5, blank=True)
   points = models.IntegerField(default=0)
+  
+  @property
+  def name(self):
+    return "%s %s" % ( self.user.first_name, self.user.last_name )
+  
+  def __str__(self):
+    return self.name
+  
 
   
 @receiver(post_save, sender=User)
@@ -54,7 +62,7 @@ class EmergencyContact(models.Model):
   last_name = models.CharField(max_length=50)
   phone = models.CharField(max_length=25)
   email = models.CharField(max_length=50)
-  # patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+  patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True)
   
   @property
   def name(self):
@@ -62,6 +70,9 @@ class EmergencyContact(models.Model):
   
   def __str__(self):
     return self.name
+  
+  def get_absolute_url(self):
+    return reverse('patient_detail')
   
 
 class Dosing(models.Model):
