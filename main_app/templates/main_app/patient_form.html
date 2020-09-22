@@ -1,11 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
 {% if object %}
     <h1>Edit <span class="teal-text">{{object.name}}</span></h1>
   {% else %}
-    <h1>Add Medication</h1>
+    <h1>Personal Info</h1>
   {% endif %}
 
   <!-- Leaving the action empty makes the form post to the same url used to display it -->
@@ -18,17 +17,18 @@
     </table>
     <input type="submit" value="Submit!" class="btn">
   </form>
-</div>
-<script>
-  const dateEl = document.getElementById('id_date_prescribed');
-  M.Datepicker.init(dateEl, {
-    format: 'yyyy-mm-dd',
-    // defaultDate: new Date(),
-    // setDefaultDate: true,
-    autoClose: true
-  });
-  const selectEl = document.getElementById('id_dose');
-  M.FormSelect.init(selectEl);
-</script>
-
+  <script>
+    const dateEl = document.getElementById('id_dob');
+    M.Datepicker.init(dateEl, {
+      format: 'yyyy-mm-dd',
+      // maxDate: new Date(),
+      // minDate: new Date(1900, 01, 01),
+      yearRange: [1900, new Date().getFullYear()],
+      // defaultDate: new Date(),
+      // setDefaultDate: true,
+      autoClose: true
+    });
+    const selectEl = document.getElementById('id_dose');
+    M.FormSelect.init(selectEl);
+  </script>
 {% endblock %}
