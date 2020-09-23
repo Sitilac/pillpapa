@@ -1,16 +1,17 @@
 from django.shortcuts import render, redirect
+from django.core.mail import send_mail
+from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
-import uuid
+from celery import Celery
+from celery.schedules import crontab
 import boto3
 from .models import *
 from .forms import *
 
 S3_BASE_URL = 'https://s3.us-east-2.amazonaws.com/'
 BUCKET = 'pillpapa'
-
-# Create your views here.
 
 def home(request):
   return render(request, 'home.html')
