@@ -91,7 +91,7 @@ class PillCreate(CreateView):
   def form_valid(self, form):
     # Assign the logged in user (self.request.user)
     form.instance.user = self.request.user
-    form.instance.patient_profile = self.request.user.patient_profile
+    form.instance.patient = self.request.user.patient_profile
     # Let the CreateView do its job as usual
     return super().form_valid(form)
   
