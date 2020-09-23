@@ -42,6 +42,14 @@ def patient_detail(request):
     'ICE':ICE,
   })
 
+def patients_detail(request, patient_id): 
+  patient = PatientProfile.objects.get(id=patient_id)
+  ICE = EmergencyContact.objects.get(patient_id=patient.id)
+  return render(request, 'patients/detail.html',{
+    'patient':patient, 
+    'ICE':ICE,
+  })
+
 def add_dosing(request, pill_id):
   form = DosingForm(request.POST)
   if form.is_valid():
@@ -132,7 +140,7 @@ def add_photo(request):
       Photo.objects.create(url=url, patient_id=request.user.patient_profile.id)
     except:
       print('An error occurred uploading file to S3')
-  return redirect('patient_detail')
+  return redirect('patient_detail', kwargs={'patient_id': request.user.patient_profile.id})
 
 @transaction.atomic
 def patient_profile_view(request):

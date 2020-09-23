@@ -122,6 +122,6 @@ STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'main_app.User'
 
-LOGIN_REDIRECT_URL = '/pills/'
+LOGIN_REDIRECT_URL = '/'
 
 LOGOUT_REDIRECT_URL = '/'

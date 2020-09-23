@@ -113,7 +113,7 @@ class EmergencyContact(models.Model):
     return self.name
   
   def get_absolute_url(self):
-    return reverse('patient_detail')
+    return reverse('patient_detail', kwargs={'patient_id': self.user.patient_profile.id})
   
 
 class Dosing(models.Model):
