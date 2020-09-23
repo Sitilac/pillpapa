@@ -21,14 +21,8 @@
     const dateEl = document.getElementById('id_dob');
     M.Datepicker.init(dateEl, {
       format: 'yyyy-mm-dd',
-      // maxDate: new Date(),
-      // minDate: new Date(1900, 01, 01),
       yearRange: [1900, new Date().getFullYear()],
-      // defaultDate: new Date(),
-      // setDefaultDate: true,
       autoClose: true
     });
-    const selectEl = document.getElementById('id_dose');
-    M.FormSelect.init(selectEl);
   </script>
 {% endblock %}

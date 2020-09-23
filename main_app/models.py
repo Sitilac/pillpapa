@@ -17,10 +17,10 @@ DOSE = (
 )
 
 class User(AbstractUser):
-  first_name = models.CharField(max_length=25)
-  last_name = models.CharField(max_length=25)
-  email = models.CharField(max_length=25)
-  phone = models.CharField(max_length=25)
+  first_name = models.CharField(max_length=25, verbose_name='First Name')
+  last_name = models.CharField(max_length=25, verbose_name='Last Name')
+  email = models.CharField(max_length=75, verbose_name='Email Address')
+  phone = models.CharField(max_length=25, verbose_name='Phone Number')
   is_patient = models.BooleanField(default=False)
   is_admin = models.BooleanField(default=False)
 
@@ -31,11 +31,10 @@ class User(AbstractUser):
   def __str__(self):
     return self.name  
 
-
 class PatientProfile(models.Model):
   user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, related_name='patient_profile')
-  room_number = models.CharField(max_length=5, blank=True)
-  dob = models.DateField(null=True)
+  room_number = models.CharField(max_length=5, blank=True, verbose_name='Room Number')
+  dob = models.DateField(null=True, verbose_name='Date of Birth')
   points = models.IntegerField(default=0)
   
   @property
@@ -45,12 +44,9 @@ class PatientProfile(models.Model):
   def __str__(self):
     return self.name
   
-  # def get_absolute_url(self):
-  #   return reverse('ICE_create')
-  
 class AdminProfile(models.Model):
   user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, related_name='admin_profile')
-  job_title = models.CharField(max_length=50)
+  job_title = models.CharField(max_length=50, verbose_name='Job Title')
   patients_list = models.ManyToManyField(PatientProfile, blank=True)
   
   @property
@@ -73,18 +69,15 @@ def save_user_profile(sender, instance, **kwargs):
     instance.patient_profile.save()
   else:
     AdminProfile.objects.get_or_create(user=instance)
-    
-    
-
 
 class Pill(models.Model):
-  name = models.CharField(max_length=75)
-  dosage = models.CharField(max_length=50)
-  directions = models.TextField(max_length=250)
-  prescribing_doctor = models.CharField(max_length=50)
-  qty = models.IntegerField()  
-  refills = models.IntegerField()  
-  date_prescribed = models.DateField()
+  name = models.CharField(max_length=75, verbose_name='Name of Medication')
+  dosage = models.CharField(max_length=50, verbose_name='Medication Dosage')
+  directions = models.TextField(max_length=250, verbose_name='Medication Directions')
+  prescribing_doctor = models.CharField(max_length=50, verbose_name='Prescribing Doctor')
+  qty = models.IntegerField(verbose_name='Initial Quantity')  
+  refills = models.IntegerField(verbose_name='Amount of Refills')  
+  date_prescribed = models.DateField(verbose_name='Initial Prescription Date')
   # qty_remaining = qty
   
   user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -95,14 +88,12 @@ class Pill(models.Model):
   
   def get_absolute_url(self):
     return reverse('detail', kwargs={'pill_id': self.id})
-
-
   
 class EmergencyContact(models.Model):
-  first_name = models.CharField(max_length=50)
-  last_name = models.CharField(max_length=50)
-  phone = models.CharField(max_length=25)
-  email = models.CharField(max_length=50)
+  first_name = models.CharField(max_length=50, verbose_name='First Name')
+  last_name = models.CharField(max_length=50, verbose_name='Last Name')
+  phone = models.CharField(max_length=25, verbose_name='Phone Number')
+  email = models.CharField(max_length=75, verbose_name='Email Address')
   patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, null=True)
   
   @property
@@ -113,9 +104,8 @@ class EmergencyContact(models.Model):
     return self.name
   
   def get_absolute_url(self):
-    return reverse('patient_detail', kwargs={'patient_id': self.user.patient_profile.id})
+    return reverse('patient_detail')
   
-
 class Dosing(models.Model):
   date = models.DateField()
   dose = models.CharField(
@@ -129,10 +119,6 @@ class Dosing(models.Model):
   class Meta:
     ordering = ['-date']
 
-# class Admin(models.Model):
-#   admin_user = models.ForeignKey(settings.AUTH_USER_MODEL)
-#   users_list = models.ManyToManyField(User)
-  
 class Photo(models.Model):
   url = models.CharField(max_length=200)
   patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE)

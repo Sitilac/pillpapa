@@ -172,6 +172,8 @@ def admin_profile_view(request):
     if user_form.is_valid() and profile_form.is_valid(): 
       user = user_form.save(commit=False)
       user.is_admin = True
+      user.is_staff = True
+      user.is_superuser = True
       user.save()
       user.admin_profile.job_title = profile_form.cleaned_data.get('job_title')
       user.admin_profile.save()
