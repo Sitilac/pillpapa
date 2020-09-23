@@ -50,7 +50,7 @@ class Pill(models.Model):
   prescribing_doctor = models.CharField(max_length=50)
   qty = models.IntegerField()  
   refills = models.IntegerField()  
-  date_prescribed = models.DateField()
+  date_prescribed = models.DateTimeField()
   # qty_remaining = qty
   
   user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -83,7 +83,7 @@ class EmergencyContact(models.Model):
   
 
 class Dosing(models.Model):
-  date = models.DateField()
+  date = models.DateTimeField()
   dose = models.CharField(
     max_length=1,
     choices= DOSE,
