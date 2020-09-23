@@ -3,6 +3,8 @@ body {
   display: flex;
   min-height: 100vh;
   flex-direction: column;
+  background-color:#EFF1F9;
+
 }
 
 main {
@@ -75,7 +77,26 @@ main img.homebackground {
   background-position: center center;
 }
 
+.card-imageRight {
+  background: url("https://i.imgur.com/PQ82qB6.jpg");
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  background-size: cover;
+  margin: 20px;
+}
 .card-image {
+  background: url("https://i.imgur.com/F0AVKWv.png");
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  background-size: 280px 200px;
+  background-repeat: no-repeat;
+  margin: 20px;
+}
+.card-imageLeft {
   background: url("https://i.imgur.com/PQ82qB6.jpg");
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
@@ -88,6 +109,7 @@ main img.homebackground {
 .card-text {
   margin: 15px;
 }
+
 
 /* .cardHome{
   color: black;
