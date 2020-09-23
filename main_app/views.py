@@ -30,6 +30,10 @@ def pill_detail(request, pill_id):
      'pill': pill, 'dosing_form':dosing_form
   })
   
+def patients_index(request):
+  patients = request.user.admin_profile.patients_list.all()
+  return render(request, 'patients/index.html', { 'patients': patients })
+  
 def patient_detail(request): 
   patient = request.user.patient_profile
   ICE = EmergencyContact.objects.get(patient_id=patient.id)
@@ -137,6 +141,7 @@ def patient_profile_view(request):
     profile_form = PatientProfileForm(request.POST)
     if user_form.is_valid() and profile_form.is_valid():
       user = user_form.save(commit=False)
+      user.is_patient = True
       user.save()
       user.patient_profile.dob = profile_form.cleaned_data.get('dob')
       user.patient_profile.room_number = profile_form.cleaned_data.get('room_number')
@@ -158,11 +163,12 @@ def admin_profile_view(request):
     profile_form = AdminProfileForm(request.POST)
     if user_form.is_valid() and profile_form.is_valid(): 
       user = user_form.save(commit=False)
+      user.is_admin = True
       user.save()
       user.admin_profile.job_title = profile_form.cleaned_data.get('job_title')
       user.admin_profile.save()
       login(request, user)
-      return redirect('index')
+      return redirect('patients_index')
   else:
     user_form = UserForm()
     profile_form = AdminProfileForm()

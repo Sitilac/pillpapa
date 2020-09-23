@@ -21,7 +21,8 @@ class User(AbstractUser):
   last_name = models.CharField(max_length=25)
   email = models.CharField(max_length=25)
   phone = models.CharField(max_length=25)
-  is_patient = models.BooleanField(default=True)
+  is_patient = models.BooleanField(default=False)
+  is_admin = models.BooleanField(default=False)
 
   @property
   def name(self):
