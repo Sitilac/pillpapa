@@ -14,5 +14,7 @@ urlpatterns = [
   path('pills/<int:pk>/delete/', views.PillDelete.as_view(), name='pills_delete'),
   path('pills/<int:pill_id>/add_dosing/', views.add_dosing, name='add_dosing'),
   path('accounts/signup/', views.signup, name='signup'),
-  path('patients/add_photo', views.add_photo, name='add_photo'),
+  path('accounts/signup/patient/', views.patient_profile_view, name='patient_profile'),
+  path('accounts/signup/admin/', views.admin_profile_view, name='admin_profile'),
+  path('patients/add_photo/', views.add_photo, name='add_photo'),
 ]

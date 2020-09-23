@@ -3,7 +3,7 @@ from django.urls import reverse
 from datetime import date
 from dateutil.relativedelta import relativedelta, MO
 from sortedm2m.fields import SortedManyToManyField
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
@@ -15,32 +15,65 @@ DOSE = (
   ('A', 'Afternoon'),
   ('N', 'Night')
 )
-class Patient(models.Model):
-  user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+class User(AbstractUser):
   first_name = models.CharField(max_length=25)
   last_name = models.CharField(max_length=25)
   email = models.CharField(max_length=25)
-  phone_num= models.CharField(max_length=25)
+  phone = models.CharField(max_length=25)
+  is_patient = models.BooleanField(default=True)
+
+  @property
+  def name(self):
+    return "%s %s" % ( self.first_name, self.last_name )
+  
+  def __str__(self):
+    return self.name  
+
+
+class PatientProfile(models.Model):
+  user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, related_name='patient_profile')
   room_number = models.CharField(max_length=5, blank=True)
   dob = models.DateField(null=True)
   points = models.IntegerField(default=0)
   
   @property
   def name(self):
-    return "%s %s" % ( self.first_name, self.last_name )
+    return "%s %s" % ( self.user.first_name, self.user.last_name )
   
   def __str__(self):
     return self.name
   
-  def get_absolute_url(self):
-    return reverse('ICE_create')
+  # def get_absolute_url(self):
+  #   return reverse('ICE_create')
   
-
+class AdminProfile(models.Model):
+  user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, related_name='admin_profile')
+  job_title = models.CharField(max_length=50)
+  patients_list = models.ManyToManyField(PatientProfile, blank=True)
   
-# @receiver(post_save, sender=User)
-# def create_user_profile(sender, instance, created, **kwargs):
-#   if created:
-#     Patient.objects.create(user=instance)
+  @property
+  def name(self):
+    return "%s %s" % ( self.user.first_name, self.user.last_name )
+  
+  def __str__(self):
+    return self.name
+  
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+  if instance.is_patient:
+    PatientProfile.objects.get_or_create(user=instance)
+  else:
+    AdminProfile.objects.get_or_create(user=instance)
+    
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+  if instance.is_patient:
+    instance.patient_profile.save()
+  else:
+    AdminProfile.objects.get_or_create(user=instance)
+    
+    
 
 
 class Pill(models.Model):
@@ -54,7 +87,7 @@ class Pill(models.Model):
   # qty_remaining = qty
   
   user = models.ForeignKey(User, on_delete=models.CASCADE)
-  patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+  patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE)
 
   def __str__(self):
     return self.name
@@ -69,7 +102,7 @@ class EmergencyContact(models.Model):
   last_name = models.CharField(max_length=50)
   phone = models.CharField(max_length=25)
   email = models.CharField(max_length=50)
-  patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True)
+  patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, null=True)
   
   @property
   def name(self):
@@ -101,7 +134,7 @@ class Dosing(models.Model):
   
 class Photo(models.Model):
   url = models.CharField(max_length=200)
-  patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+  patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE)
   
   def __str__(self):
     return f"Photo for patient: @{self.url}"

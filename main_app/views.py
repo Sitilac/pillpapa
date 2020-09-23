@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
+from django.db import transaction
 import uuid
 import boto3
 from .models import *
@@ -30,7 +31,7 @@ def pill_detail(request, pill_id):
   })
   
 def patient_detail(request): 
-  patient = request.user.patient
+  patient = request.user.patient_profile
   ICE = EmergencyContact.objects.get(patient_id=patient.id)
   return render(request, 'patients/detail.html',{
     'patient':patient, 
@@ -46,13 +47,13 @@ def add_dosing(request, pill_id):
   return redirect('detail', pill_id=pill_id)
 
 class PatientCreate(CreateView):
-  model = Patient
-  fields = ["first_name", "last_name", "email", 'dob', 'phone_num', 'room_number']
+  model = PatientProfile
+  fields = ["first_name", "last_name", "email", 'dob', 'phone', 'room_number']
   
   def form_valid(self, form):
     # Assign the logged in user (self.request.user)
     form.instance.user = self.request.user
-    form.instance.patient = self.request.user.patient
+    form.instance.patient_profile = self.request.user.patient_profile
     self.request.user.first_name = form.instance.user.first_name
     self.request.user.last_name = form.instance.user.last_name
     self.request.user.email = form.instance.user.email
@@ -61,12 +62,12 @@ class PatientCreate(CreateView):
 
 class ICECreate(CreateView):
   model = EmergencyContact
-  fields = ['first_name', 'last_name','email', 'phone']
+  fields = ['first_name', 'last_name', 'email', 'phone']
   
   def form_valid(self, form):
     # Assign the logged in user (self.request.user)
     form.instance.user = self.request.user
-    form.instance.patient = self.request.user.patient
+    form.instance.patient = self.request.user.patient_profile
     # Let the CreateView do its job as usual
     return super().form_valid(form)
   
@@ -78,7 +79,7 @@ class PillCreate(CreateView):
   def form_valid(self, form):
     # Assign the logged in user (self.request.user)
     form.instance.user = self.request.user
-    form.instance.patient = self.request.user.patient
+    form.instance.patient_profile = self.request.user.patient_profile
     # Let the CreateView do its job as usual
     return super().form_valid(form)
   
@@ -108,7 +109,7 @@ def signup(request):
       error_message = 'Invalid sign up - try again'
   # A bad POST or a GET request, so render signup.html with an empty form
   form = UserCreationForm()
-  patient = PatientForm()
+  patient = PatientProfileForm()
   #emergency_contact = ICEForm()
   context = {
     'form': form, 
@@ -124,7 +125,48 @@ def add_photo(request):
     try:
       s3.upload_fileobj(photo_file, BUCKET, key)
       url = f"{S3_BASE_URL}{BUCKET}/{key}"
-      Photo.objects.create(url=url, patient_id=request.user.patient.id)
+      Photo.objects.create(url=url, patient_id=request.user.patient_profile.id)
     except:
       print('An error occurred uploading file to S3')
   return redirect('patient_detail')
+
+@transaction.atomic
+def patient_profile_view(request):
+  if request.method == 'POST':
+    user_form = UserForm(request.POST)
+    profile_form = PatientProfileForm(request.POST)
+    if user_form.is_valid() and profile_form.is_valid():
+      user = user_form.save(commit=False)
+      user.save()
+      user.patient_profile.dob = profile_form.cleaned_data.get('dob')
+      user.patient_profile.room_number = profile_form.cleaned_data.get('room_number')
+      user.patient_profile.save()
+      login(request, user)
+      return redirect('ICE_create')
+  else:
+    user_form = UserForm()
+    profile_form = PatientProfileForm()
+  return render(request, 'registration/patient_profile.html', {
+    'user_form': user_form,
+    'profile_form': profile_form,
+  })
+
+@transaction.atomic
+def admin_profile_view(request):
+  if request.method == 'POST':
+    user_form = UserForm(request.POST)
+    profile_form = AdminProfileForm(request.POST)
+    if user_form.is_valid() and profile_form.is_valid(): 
+      user = user_form.save(commit=False)
+      user.save()
+      user.admin_profile.job_title = profile_form.cleaned_data.get('job_title')
+      user.admin_profile.save()
+      login(request, user)
+      return redirect('index')
+  else:
+    user_form = UserForm()
+    profile_form = AdminProfileForm()
+  return render(request, 'registration/admin_profile.html', {
+    'user_form': user_form,
+    'profile_form': profile_form,
+  })
