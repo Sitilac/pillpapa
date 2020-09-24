@@ -137,7 +137,7 @@ def add_photo(request):
     try:
       s3.upload_fileobj(photo_file, BUCKET, key)
       url = f"{S3_BASE_URL}{BUCKET}/{key}"
-      Photo.objects.create(url=url, patient_id=request.user.patient_profile.id)
+      Photo.objects.create(url=url)
     except:
       print('An error occurred uploading file to S3')
   return redirect('patient_detail', kwargs={'patient_id': request.user.patient_profile.id})
