@@ -208,7 +208,7 @@ def add_patient_photo(request):
       PatientPhoto.objects.create(url=url)
     except:
       print('An error occurred uploading file to S3')
-  return redirect('patient_detail', kwargs={'patient_id': request.user.patient_profile.id})
+  return redirect('patients_profile', kwargs={'patient_id': request.user.patient_profile.id})
 
 def add_admin_photo(request):
   photo_file = request.FILES.get('photo-file', None)
@@ -221,7 +221,7 @@ def add_admin_photo(request):
       AdminPhoto.objects.create(url=url)
     except:
       print('An error occurred uploading file to S3')
-  return redirect('admin_detail', kwargs={'admin_id': request.user.admin_profile.id})
+  return redirect('admins_profile', kwargs={'admin_id': request.user.admin_profile.id})
 
 @transaction.atomic
 def patient_profile_view(request):

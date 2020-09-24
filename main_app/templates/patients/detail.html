@@ -11,8 +11,8 @@
           {% if patient.patient_photo_set.last %}
             <img class="responsive-img card-panel" src="{{patient.patient_photo_set.last.url}}">
           {% endif %}
-          <p>Email: {{ patient.email }}</p>
-          <p>Phone: {{ patient.phone_num }}</p>
+          <p>Email: {{ patient.user.email }}</p>
+          <p>Phone: {{ patient.user.phone }}</p>
           <p>Date of Birth: {{ patient.dob }}</p>
           {% if patient.room_number %}
           <p>Room Number: {{ patient.room_number }}</p>

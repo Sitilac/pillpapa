@@ -114,7 +114,7 @@ class EmergencyContact(models.Model):
     return self.name
   
   def get_absolute_url(self):
-    return reverse('patient_detail')
+    return reverse('patients_profile')
   
 class Dosing(models.Model):
   time = models.TimeField()
