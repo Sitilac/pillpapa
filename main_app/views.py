@@ -1,8 +1,16 @@
 from django.shortcuts import render, redirect
+from django.core.mail import send_mail
+from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
+from django.forms import formset_factory
 from django.db import transaction
+from datetime import date, datetime
+from tzlocal import get_localzone
+from dateutil import *
+from django.utils import timezone
+import pytz
 import uuid
 import boto3
 from .models import *
@@ -10,8 +18,6 @@ from .forms import *
 
 S3_BASE_URL = 'https://s3.us-east-2.amazonaws.com/'
 BUCKET = 'pillpapa'
-
-# Create your views here.
 
 def home(request):
   return render(request, 'home.html')
@@ -25,10 +31,57 @@ def pills_index(request):
 
 def pill_detail(request, pill_id):
   pill = Pill.objects.get(id=pill_id)
+  time = datetime.now()
+  #Make sure pill dosing total is up to date
+  d = Dosing.objects.filter(pill_id = pill_id)
+  dosing_count = d.count()
+  pill.dosing_total = dosing_count
+  pill.save(update_fields=['dosing_total'])
+  if(pill.dose_date != date.today()):
+    pill.dose_date = date.today()
+    pill.doses_taken = 1
+    pill.save(update_fields=['doses_taken','dose_date'])
+  
   dosing_form = DosingForm()
   return render(request, 'pills/detail.html', {
-     'pill': pill, 'dosing_form':dosing_form
+     'pill': pill, 'dosing_form':dosing_form, "dosing": d,"time":time
   })
+  
+def dose_taken(request, pill_id):
+  pill = Pill.objects.get(id=pill_id)
+  dosing = Dosing.objects.filter(pill_id=pill_id)
+  
+  if(pill.qty != pill.qty_remaining and pill.qty_remaining > pill.qty ):
+    pill.qty_remaining = pill.qty
+    pill.save(update_fields=['qty_remaining'])
+    
+  idx = pill.dosing_total - pill.doses_taken
+  pill.doses_taken = pill.doses_taken + 1
+  pill.qty_remaining = pill.qty_remaining - dosing[idx].dose
+  pill.save(update_fields=['doses_taken','qty_remaining'])
+  
+  return redirect('detail', pill_id=pill_id)
+
+def add_dosing(request, pill_id):
+  # creating a formset 
+  DoseFormSet = formset_factory(DosingForm) 
+  formset = DoseFormSet() 
+  if request.method == 'GET':
+    formset = DoseFormSet(request.GET or None)
+  elif request.method == 'POST':
+    formset = DoseFormSet(request.POST) 
+    if formset.is_valid():
+      for form in formset:
+        if form.cleaned_data.get('time'):
+          new_dosing = form.save(commit=False)
+          new_dosing.pill_id = pill_id
+          new_dosing.save()
+      return redirect('detail', pill_id=pill_id)
+
+  context = {
+    'formset': formset,
+  }
+  return render(request, "dosing/dosing.html", context)
   
 def patients_index(request):
   patients = PatientProfile.objects.all
@@ -75,14 +128,6 @@ def admins_profile(request):
     # 'patients':patients,
   })
 
-def add_dosing(request, pill_id):
-  form = DosingForm(request.POST)
-  if form.is_valid():
-    new_dosing = form.save(commit=False)
-    new_dosing.pill_id = pill_id
-    new_dosing.save()
-  return redirect('detail', pill_id=pill_id)
-
 class PatientCreate(CreateView):
   model = PatientProfile
   fields = ["first_name", "last_name", "email", 'dob', 'phone', 'room_number']
@@ -108,7 +153,6 @@ class ICECreate(CreateView):
     # Let the CreateView do its job as usual
     return super().form_valid(form)
   
-
 class PillCreate(CreateView):
   model = Pill
   fields = ['name','dosage','directions', 'prescribing_doctor','qty','refills', 'date_prescribed']
@@ -120,7 +164,6 @@ class PillCreate(CreateView):
     # Let the CreateView do its job as usual
     return super().form_valid(form)
   
-
 class PillUpdate(UpdateView):
   model = Pill
   fields = ['name', 'dosage', 'directions', 'prescribing_doctor', 'qty', 'refills', 'date_prescribed']

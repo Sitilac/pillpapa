@@ -1,6 +1,6 @@
 from django.db import models
 from django.urls import reverse
-from datetime import date
+from datetime import date,datetime
 from dateutil.relativedelta import relativedelta, MO
 from sortedm2m.fields import SortedManyToManyField
 from django.contrib.auth.models import User, AbstractUser
@@ -10,11 +10,11 @@ from django.conf import settings
 
 # Create your models here.
 
-DOSE = (
-  ('M', 'Morning'),
-  ('A', 'Afternoon'),
-  ('N', 'Night')
-)
+# DOSE = (
+#   ('M', 'Morning'),
+#   ('A', 'Afternoon'),
+#   ('N', 'Night')
+# )
 
 class User(AbstractUser):
   first_name = models.CharField(max_length=25, verbose_name='First Name')
@@ -78,7 +78,11 @@ class Pill(models.Model):
   qty = models.IntegerField(verbose_name='Initial Quantity')  
   refills = models.IntegerField(verbose_name='Amount of Refills')  
   date_prescribed = models.DateField(verbose_name='Initial Prescription Date')
-  # qty_remaining = qty
+  dosing_total = models.IntegerField(default=0)
+  doses_taken = models.IntegerField(default=1)
+  dose_date = models.DateField(default= datetime.now)
+  dose_date_switch = models.IntegerField(default=0)
+  qty_remaining = models.IntegerField(default=273)
   
   user = models.ForeignKey(User, on_delete=models.CASCADE)
   patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE)
@@ -88,6 +92,12 @@ class Pill(models.Model):
   
   def get_absolute_url(self):
     return reverse('detail', kwargs={'pill_id': self.id})
+  
+  def dose_on_time(self):
+    dose_on = self.dosing_total - self.doses_taken
+    d = Dosing.objects.filter(pill_id = self.id)
+    return d[dose_on]
+    
   
 class EmergencyContact(models.Model):
   first_name = models.CharField(max_length=50, verbose_name='First Name')
@@ -107,17 +117,17 @@ class EmergencyContact(models.Model):
     return reverse('patient_detail')
   
 class Dosing(models.Model):
-  date = models.DateField()
-  dose = models.CharField(
-    max_length=1,
-    choices= DOSE,
-    default=DOSE[0][0]
-  )
+  time = models.TimeField()
+  dose = models.IntegerField()
+  # dose = models.CharField(
+  #   max_length=1,
+  #   choices= DOSE,
+  #   default=DOSE[0][0]
+  # )
   pill = models.ForeignKey(Pill, on_delete=models.CASCADE)
-  def __str__(self):
-    return f"{self.get_dose_display()} on {self.date}"
+
   class Meta:
-    ordering = ['-date']
+    ordering = ['-time']
 
 class PatientPhoto(models.Model):
   url = models.CharField(max_length=200)
