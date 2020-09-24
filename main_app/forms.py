@@ -2,15 +2,17 @@ from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
+from django.forms import formset_factory
 from datetime import datetime, time
-from .models import Dosing, Patient, EmergencyContact
 from .models import *
 
 
 class DosingForm(ModelForm):
   class Meta:
     model = Dosing
-    fields = ['date', 'dose']
+    fields = ['time', 'dose']
+
+DoseFormSet = formset_factory(DosingForm)
     
 class UserForm(forms.ModelForm):
   password1 = forms.CharField(label='Password', widget=forms.PasswordInput)

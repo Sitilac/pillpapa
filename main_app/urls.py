@@ -16,6 +16,7 @@ urlpatterns = [
   path('pills/<int:pk>/update/', views.PillUpdate.as_view(), name='pills_update'),
   path('pills/<int:pk>/delete/', views.PillDelete.as_view(), name='pills_delete'),
   path('pills/<int:pill_id>/add_dosing/', views.add_dosing, name='add_dosing'),
+  path('pills/<int:pill_id>/dose_taken/', views.dose_taken, name='dose_taken'),
   path('accounts/signup/', views.signup, name='signup'),
   path('accounts/signup/patient/', views.patient_profile_view, name='patient_profile'),
   path('accounts/signup/admin/', views.admin_profile_view, name='admin_profile'),
