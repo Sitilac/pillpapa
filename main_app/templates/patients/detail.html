@@ -14,12 +14,8 @@
           <p>Email: {{ patient.user.email }}</p>
           <p>Phone: {{ patient.user.phone }}</p>
           <p>Date of Birth: {{ patient.dob }}</p>
-          {% if patient.room_number %}
           <p>Room Number: {{ patient.room_number }}</p>
-          {% endif %}
-          {% if patient.points > 0 %}
           <p>Points: {{ patient.points }}</p>
-          {% endif %}
           <h2>Emergency Contact Info</h2>
           <p>{{ICE.name}}</p>
           <p>{{ICE.phone}}</p>
@@ -29,11 +25,10 @@
             <p>Name: {{ pill.name }}</p>
             <p>Dosage: {{ pill.dosage }}</p>
             <p>Refills: {{ pill.refills }}</p>
-            <!-- <p>Quantity Remaining: {{ pill.qty_remaining }}</p> -->
+            <p>Quantity Remaining: {{ pill.qty_remaining }}</p>
           {% empty %}
             <div class="card-panel red-text center-align">{{ patient.name }} Has Not Yet Added Any Pills</div>
           {% endfor %}
-          <a href="{% url 'pills_create'}">Add Pills For {{patient.name }}</a>
         </div>
       </div>
     </div>

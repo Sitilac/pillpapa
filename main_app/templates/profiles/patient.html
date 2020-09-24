@@ -31,12 +31,12 @@
             <p>Name: {{ pill.name }}</p>
             <p>Dosage: {{ pill.dosage }}</p>
             <p>Refills: {{ pill.refills }}</p>
-            <!-- <p>Quantity Remaining: {{ pill.qty_remaining }}</p> -->
+            <p>Quantity Remaining: {{ pill.qty_remaining }}</p>
           </a>
           {% empty %}
             <div class="card-panel red-text center-align">{{ patient.name }} Has Not Yet Added Any Pills</div>
-            <a href="{% url 'pills_create'}">Add Pills</a>
-          {% endfor %}
+          {% endfor %} <br>
+          <a href="{% url 'pills_create' %}">Add Pills</a>
         </div>
       </div>
       <div class="card-action">
