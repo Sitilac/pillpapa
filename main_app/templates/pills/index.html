@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container">
-  <h1 class="h1Forms centeredHeader">Pill List</h1>  
+  <h1 class="h1FormsIndex centeredHeader">Pill List</h1>  
   {% for pill in pills %}
     <a href="{% url 'detail' pill.id %}">
       <div class="card">
