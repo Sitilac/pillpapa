@@ -11,6 +11,9 @@
         <p>Dosage: {{ pill.dosage }}</p>
         <p>Directions: {{ pill.directions }}</p>
         <p>Prescribing Doctor: {{ pill.prescribing_doctor }}</p>
+        {% if pill.qty_remaining < pill.qty %}
+          <p>Quantity Remaining: {{ pill.qty_remaining }}</p>
+      {% endif %}
       </div>
     </div>
     <div class="card-action">
@@ -20,12 +23,14 @@
   </div>
 </div>
 <div class="col s6">
-  <form action= "{% url 'add_dosing' pill.id %}" method="post">
-    {% csrf_token %}
-    {{ dosing_form.as_p }}
-    <input type="submit" class="btn" value="Add Dosing">
-  </form>
+  <a href="{% url 'add_dosing' pill.id %}">Create Dosing Directions</a>
   <!-- new code above -->
+{% if time.time > pill.dose_on_time.time %}
+<h6>You are late in taking your pills from {{pill.dose_on_time.time}}</h6>
+{% endif %}
+{% if pill.dosing_total == pill.doses_taken %}
+  <br><a href="{% url 'dose_taken' pill.id %}">Mark Dose Taken</a>
+{% endif %}
   <table class="striped">
     <thead>
       <tr><th>Date</th><th>Dose</th></tr>
@@ -33,8 +38,8 @@
     <tbody>
       {% for dose in pill.dosing_set.all %}
         <tr>
-          <td>{{dose.date}}</td>
-          <td>{{dose.get_dose_display}}</td>
+          <td>{{dose.time}}</td>
+          <td>{{dose.dose}}</td>
         </tr>
       {% endfor %}
     </tbody>
@@ -42,15 +47,16 @@
 </div>
 </div>
 <script>
-  const dateEl = document.getElementById('id_date');
+  const dateEl = document.getElementById('id_form-0-date');
+//   $(function () {
+//     $('id_date').datetimepicker();
+//  });
   M.Datepicker.init(dateEl, {
     format: 'yyyy-mm-dd',
     defaultDate: new Date(),
     setDefaultDate: true,
     autoClose: true
   });
-  const selectEl = document.getElementById('id_dose');
-  M.FormSelect.init(selectEl);
 </script>
 </div>
 {% endblock %}

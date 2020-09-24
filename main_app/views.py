@@ -1,8 +1,16 @@
 from django.shortcuts import render, redirect
+from django.core.mail import send_mail
+from django.http import HttpResponse
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
+from django.forms import formset_factory
 from django.db import transaction
+from datetime import date, datetime
+from tzlocal import get_localzone
+from dateutil import *
+from django.utils import timezone
+import pytz
 import uuid
 import boto3
 from .models import *
@@ -10,8 +18,6 @@ from .forms import *
 
 S3_BASE_URL = 'https://s3.us-east-2.amazonaws.com/'
 BUCKET = 'pillpapa'
-
-# Create your views here.
 
 def home(request):
   return render(request, 'home.html')
@@ -25,38 +31,102 @@ def pills_index(request):
 
 def pill_detail(request, pill_id):
   pill = Pill.objects.get(id=pill_id)
+  time = datetime.now()
+  #Make sure pill dosing total is up to date
+  d = Dosing.objects.filter(pill_id = pill_id)
+  dosing_count = d.count()
+  pill.dosing_total = dosing_count
+  pill.save(update_fields=['dosing_total'])
+  if(pill.dose_date != date.today()):
+    pill.dose_date = date.today()
+    pill.doses_taken = 1
+    pill.save(update_fields=['doses_taken','dose_date'])
+  
   dosing_form = DosingForm()
   return render(request, 'pills/detail.html', {
-     'pill': pill, 'dosing_form':dosing_form
+     'pill': pill, 'dosing_form':dosing_form, "dosing": d,"time":time
   })
+  
+def dose_taken(request, pill_id):
+  pill = Pill.objects.get(id=pill_id)
+  dosing = Dosing.objects.filter(pill_id=pill_id)
+  
+  if(pill.qty != pill.qty_remaining and pill.qty_remaining > pill.qty ):
+    pill.qty_remaining = pill.qty
+    pill.save(update_fields=['qty_remaining'])
+    
+  idx = pill.dosing_total - pill.doses_taken
+  pill.doses_taken = pill.doses_taken + 1
+  pill.qty_remaining = pill.qty_remaining - dosing[idx].dose
+  pill.save(update_fields=['doses_taken','qty_remaining'])
+  
+  return redirect('detail', pill_id=pill_id)
+
+def add_dosing(request, pill_id):
+  # creating a formset 
+  DoseFormSet = formset_factory(DosingForm) 
+  formset = DoseFormSet() 
+  if request.method == 'GET':
+    formset = DoseFormSet(request.GET or None)
+  elif request.method == 'POST':
+    formset = DoseFormSet(request.POST) 
+    if formset.is_valid():
+      for form in formset:
+        if form.cleaned_data.get('time'):
+          new_dosing = form.save(commit=False)
+          new_dosing.pill_id = pill_id
+          new_dosing.save()
+      return redirect('detail', pill_id=pill_id)
+
+  context = {
+    'formset': formset,
+  }
+  return render(request, "dosing/dosing.html", context)
   
 def patients_index(request):
+  patients = PatientProfile.objects.all
+  admins_patients = request.user.admin_profile.patients_list.all()
+  return render(request, 'patients/index.html', {
+     'patients': patients,
+     'admins_patients': admins_patients,
+      })
+
+def patients_admins_index(request):
   patients = request.user.admin_profile.patients_list.all()
-  return render(request, 'patients/index.html', { 'patients': patients })
+  return render(request, 'patients/admins_index.html', { 'patients': patients })
   
-def patient_detail(request): 
-  patient = request.user.patient_profile
-  ICE = EmergencyContact.objects.get(patient_id=patient.id)
-  return render(request, 'patients/detail.html',{
-    'patient':patient, 
-    'ICE':ICE,
-  })
+def add_patient(request, patient_id):
+  patient = PatientProfile.objects.get(id=patient_id)
+  admin = request.user.admin_profile
+  admin.patients_list.add(patient)
+  admin.save()
+  return redirect('patients_detail', patient_id=patient_id)
 
 def patients_detail(request, patient_id): 
   patient = PatientProfile.objects.get(id=patient_id)
   ICE = EmergencyContact.objects.get(patient_id=patient.id)
+  pills = Pill.objects.get(patient_id=patient.id)
   return render(request, 'patients/detail.html',{
+    'patient':patient, 
+    'ICE':ICE,
+    'pills':pills,
+  })
+
+def patients_profile(request): 
+  patient = request.user.patient_profile
+  ICE = EmergencyContact.objects.get(patient_id=patient.id)
+  return render(request, 'profiles/patient.html',{
     'patient':patient, 
     'ICE':ICE,
   })
 
-def add_dosing(request, pill_id):
-  form = DosingForm(request.POST)
-  if form.is_valid():
-    new_dosing = form.save(commit=False)
-    new_dosing.pill_id = pill_id
-    new_dosing.save()
-  return redirect('detail', pill_id=pill_id)
+def admins_profile(request): 
+  admin = request.user.admin_profile
+  # patients = PatientProfile.objects.get()
+  return render(request, 'profiles/admin.html',{
+    'admin':admin, 
+    # 'patients':patients,
+  })
 
 class PatientCreate(CreateView):
   model = PatientProfile
@@ -83,7 +153,6 @@ class ICECreate(CreateView):
     # Let the CreateView do its job as usual
     return super().form_valid(form)
   
-
 class PillCreate(CreateView):
   model = Pill
   fields = ['name','dosage','directions', 'prescribing_doctor','qty','refills', 'date_prescribed']
@@ -95,7 +164,6 @@ class PillCreate(CreateView):
     # Let the CreateView do its job as usual
     return super().form_valid(form)
   
-
 class PillUpdate(UpdateView):
   model = Pill
   fields = ['name', 'dosage', 'directions', 'prescribing_doctor', 'qty', 'refills', 'date_prescribed']
@@ -129,7 +197,7 @@ def signup(request):
   }
   return render(request, 'registration/signup.html', context)
 
-def add_photo(request):
+def add_patient_photo(request):
   photo_file = request.FILES.get('photo-file', None)
   if photo_file:
     s3 = boto3.client('s3')
@@ -137,10 +205,23 @@ def add_photo(request):
     try:
       s3.upload_fileobj(photo_file, BUCKET, key)
       url = f"{S3_BASE_URL}{BUCKET}/{key}"
-      Photo.objects.create(url=url, patient_id=request.user.patient_profile.id)
+      PatientPhoto.objects.create(url=url)
     except:
       print('An error occurred uploading file to S3')
-  return redirect('patient_detail', kwargs={'patient_id': request.user.patient_profile.id})
+  return redirect('patients_profile', kwargs={'patient_id': request.user.patient_profile.id})
+
+def add_admin_photo(request):
+  photo_file = request.FILES.get('photo-file', None)
+  if photo_file:
+    s3 = boto3.client('s3')
+    key = uuid.uuid4().hex[:6] + photo_file.name[photo_file.name.rfind('.'):]
+    try:
+      s3.upload_fileobj(photo_file, BUCKET, key)
+      url = f"{S3_BASE_URL}{BUCKET}/{key}"
+      AdminPhoto.objects.create(url=url)
+    except:
+      print('An error occurred uploading file to S3')
+  return redirect('admins_profile', kwargs={'admin_id': request.user.admin_profile.id})
 
 @transaction.atomic
 def patient_profile_view(request):

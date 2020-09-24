@@ -9,7 +9,9 @@
   <title>Pill Papa</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
   <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+  <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js" type="text/javascript"></script>
 </head>
 <body>
   <header class="navbar-fixed">
@@ -21,10 +23,17 @@
         <ul class="right">
           <li><a href="{% url 'about' %}">About</a></li>
           {% if user.is_authenticated %}
-            <li><a href="{% url 'patients_index' %}">View Patients List</a></li>
-            <li><a href="{% url 'patient_detail' %}">View Profile</a></li>
-            <li><a href="{% url 'pills_create' %}">Add New Meds</a></li>
-            <li><a href="{% url 'index' %}">View All My Meds</a></li>
+            {% if user.is_admin %}
+              <li><a href="{% url 'admins_profile' %}">View Profile</a></li>
+              <li><a href="{% url 'patients_index' %}">View All Patients</a></li>
+              <li><a href="{% url 'patients_admins_index' %}">View My Patients</a></li>
+              <!-- <li><a href="{% url 'patient_create' %}">Create New Patient</a></li> -->
+            {% endif %}
+            {% if user.is_patient %}
+              <li><a href="{% url 'patients_profile' %}">View Profile</a></li>
+              <li><a href="{% url 'index' %}">View All My Meds</a></li>
+              <li><a href="{% url 'pills_create' %}">Add New Meds</a></li>
+            {% endif %}
             <li><a href="{% url 'logout' %}">Log Out</a></li>
           {% else %}
           <li><a href="{% url 'signup' %}">Sign Up</a></li>
