@@ -21,10 +21,17 @@
         <ul class="right">
           <li><a href="{% url 'about' %}">About</a></li>
           {% if user.is_authenticated %}
-            <li><a href="{% url 'patients_index' %}">View Patients List</a></li>
-            <li><a href="{% url 'patient_detail' %}">View Profile</a></li>
-            <li><a href="{% url 'pills_create' %}">Add New Meds</a></li>
-            <li><a href="{% url 'index' %}">View All My Meds</a></li>
+            {% if user.is_admin %}
+              <li><a href="{% url 'admins_profile' %}">View Profile</a></li>
+              <li><a href="{% url 'patients_index' %}">View All Patients</a></li>
+              <li><a href="{% url 'patients_admins_index' %}">View My Patients</a></li>
+              <!-- <li><a href="{% url 'patient_create' %}">Create New Patient</a></li> -->
+            {% endif %}
+            {% if user.is_patient %}
+              <li><a href="{% url 'patients_profile' %}">View Profile</a></li>
+              <li><a href="{% url 'index' %}">View All My Meds</a></li>
+              <li><a href="{% url 'pills_create' %}">Add New Meds</a></li>
+            {% endif %}
             <li><a href="{% url 'logout' %}">Log Out</a></li>
           {% else %}
           <li><a href="{% url 'signup' %}">Sign Up</a></li>
