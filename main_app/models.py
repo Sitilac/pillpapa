@@ -129,9 +129,16 @@ class Dosing(models.Model):
   class Meta:
     ordering = ['-time']
 
-class Photo(models.Model):
+class PatientPhoto(models.Model):
   url = models.CharField(max_length=200)
   patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE)
   
   def __str__(self):
     return f"Photo for patient: @{self.url}"
+
+class AdminPhoto(models.Model):
+  url = models.CharField(max_length=200)
+  admin = models.ForeignKey(AdminProfile, on_delete=models.CASCADE)
+  
+  def __str__(self):
+    return f"Photo for admin: @{self.url}"
