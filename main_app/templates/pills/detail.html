@@ -11,6 +11,9 @@
         <p>Dosage: {{ pill.dosage }}</p>
         <p>Directions: {{ pill.directions }}</p>
         <p>Prescribing Doctor: {{ pill.prescribing_doctor }}</p>
+        {% if pill.qty_remaining < pill.qty %}
+          <p>Quantity Remaining: {{ pill.qty_remaining }}</p>
+      {% endif %}
       </div>
     </div>
     <div class="card-action">
@@ -25,7 +28,9 @@
 {% if time.time > pill.dose_on_time.time %}
 <h6>You are late in taking your pills from {{pill.dose_on_time.time}}</h6>
 {% endif %}
-<br><a href="{% url 'dose_taken' pill.id %}">Mark Dose Taken</a>
+{% if pill.dosing_total == pill.doses_taken %}
+  <br><a href="{% url 'dose_taken' pill.id %}">Mark Dose Taken</a>
+{% endif %}
   <table class="striped">
     <thead>
       <tr><th>Date</th><th>Dose</th></tr>
