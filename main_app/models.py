@@ -119,15 +119,10 @@ class EmergencyContact(models.Model):
 class Dosing(models.Model):
   time = models.TimeField()
   dose = models.IntegerField()
-  # dose = models.CharField(
-  #   max_length=1,
-  #   choices= DOSE,
-  #   default=DOSE[0][0]
-  # )
   pill = models.ForeignKey(Pill, on_delete=models.CASCADE)
 
   class Meta:
-    ordering = ['-time']
+    ordering = ['time']
 
 class PatientPhoto(models.Model):
   url = models.CharField(max_length=200)
