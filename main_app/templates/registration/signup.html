@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
-
-<h1>Sign Up As:</h1>
-
-<a href="{% url 'patient_profile' %}">A Patient</a>
-<a href="{% url 'admin_profile' %}">An Admin</a>
-
+<div class="centeredFormsSign">
+    <h1 class="h1Forms">Sign Up As:</h1>
+    <div class= "signUpContainer">
+        <a href="{% url 'patient_profile' %}" class="item-a">A Patient</a>
+        <a href="{% url 'admin_profile' %}" class="item-b">An Admin</a>
+    </div>
+</div>
 {% endblock %}
