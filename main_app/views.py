@@ -31,23 +31,48 @@ def pill_detail(request, pill_id):
   })
   
 def patients_index(request):
+  patients = PatientProfile.objects.all
+  admins_patients = request.user.admin_profile.patients_list.all()
+  return render(request, 'patients/index.html', {
+     'patients': patients,
+     'admins_patients': admins_patients,
+      })
+
+def patients_admins_index(request):
   patients = request.user.admin_profile.patients_list.all()
-  return render(request, 'patients/index.html', { 'patients': patients })
+  return render(request, 'patients/admins_index.html', { 'patients': patients })
   
-def patient_detail(request): 
-  patient = request.user.patient_profile
-  ICE = EmergencyContact.objects.get(patient_id=patient.id)
-  return render(request, 'patients/detail.html',{
-    'patient':patient, 
-    'ICE':ICE,
-  })
+def add_patient(request, patient_id):
+  patient = PatientProfile.objects.get(id=patient_id)
+  admin = request.user.admin_profile
+  admin.patients_list.add(patient)
+  admin.save()
+  return redirect('patients_detail', patient_id=patient_id)
 
 def patients_detail(request, patient_id): 
   patient = PatientProfile.objects.get(id=patient_id)
   ICE = EmergencyContact.objects.get(patient_id=patient.id)
+  pills = Pill.objects.get(patient_id=patient.id)
   return render(request, 'patients/detail.html',{
     'patient':patient, 
     'ICE':ICE,
+    'pills':pills,
+  })
+
+def patients_profile(request): 
+  patient = request.user.patient_profile
+  ICE = EmergencyContact.objects.get(patient_id=patient.id)
+  return render(request, 'profiles/patient.html',{
+    'patient':patient, 
+    'ICE':ICE,
+  })
+
+def admins_profile(request): 
+  admin = request.user.admin_profile
+  # patients = PatientProfile.objects.get()
+  return render(request, 'profiles/admin.html',{
+    'admin':admin, 
+    # 'patients':patients,
   })
 
 def add_dosing(request, pill_id):
@@ -129,7 +154,7 @@ def signup(request):
   }
   return render(request, 'registration/signup.html', context)
 
-def add_photo(request):
+def add_patient_photo(request):
   photo_file = request.FILES.get('photo-file', None)
   if photo_file:
     s3 = boto3.client('s3')
@@ -137,10 +162,23 @@ def add_photo(request):
     try:
       s3.upload_fileobj(photo_file, BUCKET, key)
       url = f"{S3_BASE_URL}{BUCKET}/{key}"
-      Photo.objects.create(url=url)
+      PatientPhoto.objects.create(url=url)
     except:
       print('An error occurred uploading file to S3')
   return redirect('patient_detail', kwargs={'patient_id': request.user.patient_profile.id})
+
+def add_admin_photo(request):
+  photo_file = request.FILES.get('photo-file', None)
+  if photo_file:
+    s3 = boto3.client('s3')
+    key = uuid.uuid4().hex[:6] + photo_file.name[photo_file.name.rfind('.'):]
+    try:
+      s3.upload_fileobj(photo_file, BUCKET, key)
+      url = f"{S3_BASE_URL}{BUCKET}/{key}"
+      AdminPhoto.objects.create(url=url)
+    except:
+      print('An error occurred uploading file to S3')
+  return redirect('admin_detail', kwargs={'admin_id': request.user.admin_profile.id})
 
 @transaction.atomic
 def patient_profile_view(request):

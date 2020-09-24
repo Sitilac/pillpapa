@@ -1,7 +1,7 @@
 {% extends 'base.html' %} 
 {% block content %}
 
-<h1>Patient List</h1>
+<h1>{{ user.name }}'s Patient List</h1>
 
 {% for patient in patients %}
 <div class="card">
@@ -15,9 +15,6 @@
       <p>Points: {{ patient.points }}</p>
     </div>
   </a>
-  {% if patient not in admins_patients %}
-    <a href="{% url 'add_patient' patient.id%}">Add To My Patients</a>
-  {% endif %}
 </div>
 {% endfor %} 
 
