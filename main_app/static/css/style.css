@@ -55,8 +55,24 @@ div.sub-full-bleed.remove-padding {
 }
 
 .centeredForms {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: whitesmoke;
+  box-shadow: 5px 5px 15px rgba(0,0,0,0.9);
+  border-radius: 18px;
+  font-size: 20px;
+  display: grid;
+  grid-template-columns: 500px;
+  grid-template-rows: 140px;
+  padding-left: 100px;
+  padding-right: 100px;
+}
+
+.centeredFormsAdmin {
   position: absolute;
-  top: 52%;
+  top: 30%;
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: whitesmoke;
@@ -64,11 +80,14 @@ div.sub-full-bleed.remove-padding {
   border-radius: 18px;
   font-size: 30px;
   display: grid;
-  grid-template-columns: 500px;
-  grid-template-rows: 140px;
+  grid-template-columns: 300px;
+  grid-template-rows: 10px;
+  margin-top: 25vh;
   padding-left: 100px;
   padding-right: 100px;
+  font-size: 10px;
 }
+
 
 .centeredHeader {
   position: relative;
