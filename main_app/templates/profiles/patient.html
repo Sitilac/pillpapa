@@ -6,8 +6,8 @@
     <div class="col s6">
       <div class="card">
         <div class="card-content">
-          {% if patient.patient_photo_set.last %}
-            <img class="responsive-img card-panel" src="{{patient.patient_photo_set.last.url}}">
+          {% if patient.patientphoto_set.last %}
+            <img class="responsive-img card-panel" src="{{patient.patientphoto_set.last.url}}">
           {% else %}
             <div class="card-panel red-text center-align">No Photos Uploaded</div>
           {% endif %}
@@ -40,7 +40,7 @@
       </div>
       <div class="card-action">
         <h2>{{ patient.name }}'s Photos</h2>
-          {% for photo in patient.patient_photo_set.all %}
+          {% for photo in patient.patientphoto_set.all %}
           <img class="responsive-img card-panel" src="{{photo.url}}">
           {% empty %}
           <div class="card-panel red-text center-align">No Photos Uploaded</div>
