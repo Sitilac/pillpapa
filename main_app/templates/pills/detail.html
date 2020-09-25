@@ -22,11 +22,14 @@
   </div>
 </div>
 <div class="col s6">
-  <a href="{% url 'add_dosing' pill.id %}">Create Dosing Directions</a>
+  {% if pill.dosing_set.count %}
+  {%else%}<!-- this is where we will put the edit dosing instructions -->
+    <a href="{% url 'add_dosing' pill.id %}">Create Dosing Directions</a>
+  {% endif %}
   {% if time.time > pill.dose_on_time.time %}
     <h6>You are late in taking your pills from {{pill.dose_on_time.time}}</h6>
   {% endif %}
-  {% if pill.dosing_total == pill.doses_taken %}
+  {% if pill.doses_total_plus_one != pill.doses_taken %}
     <br><a href="{% url 'dose_taken' pill.id %}">Mark Dose Taken</a>
   {% endif %}
   <table class="striped">

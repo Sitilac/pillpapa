@@ -19,7 +19,7 @@ class User(AbstractUser):
   @property
   def name(self):
     return "%s %s" % ( self.first_name, self.last_name )
- 
+
   def __str__(self):
     return self.name  
 
@@ -32,22 +32,22 @@ class PatientProfile(models.Model):
   @property
   def name(self):
     return "%s %s" % ( self.user.first_name, self.user.last_name )
- 
+
   def __str__(self):
     return self.name
- 
+
 class AdminProfile(models.Model):
   user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, related_name='admin_profile')
   job_title = models.CharField(max_length=50, verbose_name='Job Title')
   patients_list = models.ManyToManyField(PatientProfile, blank=True)
- 
+
   @property
   def name(self):
     return "%s %s" % ( self.user.first_name, self.user.last_name )
- 
+
   def __str__(self):
     return self.name
- 
+
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
   if instance.is_patient:
@@ -83,11 +83,15 @@ class Pill(models.Model):
 
   def get_absolute_url(self):
     return reverse('detail', kwargs={'pill_id': self.id})
- 
+
   def dose_on_time(self):
     dose_on = self.dosing_total - self.doses_taken
     d = Dosing.objects.filter(pill_id = self.id)
     return d[dose_on]
+
+  def doses_total_plus_one(self):
+    dt = self.dosing_total + 1
+    return dt
 
 class EmergencyContact(models.Model):
   first_name = models.CharField(max_length=50, verbose_name='First Name')
@@ -112,7 +116,7 @@ class Dosing(models.Model):
   pill = models.ForeignKey(Pill, on_delete=models.CASCADE)
 
   class Meta:
-    ordering = ['time']
+    ordering = ['-time']
 
 class PatientPhoto(models.Model):
   url = models.CharField(max_length=200)

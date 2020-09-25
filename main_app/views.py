@@ -48,7 +48,6 @@ def pill_detail(request, pill_id):
 def dose_taken(request, pill_id):
   pill = Pill.objects.get(id=pill_id)
   dosing = Dosing.objects.filter(pill_id=pill_id)
-
   time = datetime.now()
   time = time.time()
   time = int(time.strftime('%H'))
@@ -138,7 +137,7 @@ def admins_profile(request):
 class PatientCreate(CreateView):
   model = PatientProfile
   fields = ['first_name', 'last_name', 'email', 'dob', 'phone', 'room_number']
-  
+
   def form_valid(self, form):
     form.instance.user = self.request.user
     form.instance.patient_profile = self.request.user.patient_profile
@@ -150,7 +149,7 @@ class PatientCreate(CreateView):
 class ICECreate(CreateView):
   model = EmergencyContact
   fields = ['first_name', 'last_name', 'email', 'phone']
-  
+
   def form_valid(self, form):
     form.instance.user = self.request.user
     form.instance.patient = self.request.user.patient_profile
@@ -161,12 +160,10 @@ class PillCreate(CreateView):
   fields = ['name', 'dosage', 'directions', 'prescribing_doctor', 'qty', 'refills', 'date_prescribed']
 
   def form_valid(self, form):
-    # Assign the logged in user (self.request.user)
     form.instance.user = self.request.user
     form.instance.patient = self.request.user.patient_profile
-    # Let the CreateView do its job as usual
     return super().form_valid(form)
-  
+
 class PillUpdate(UpdateView):
   model = Pill
   fields = ['name', 'dosage', 'directions', 'prescribing_doctor', 'qty', 'refills', 'date_prescribed']
@@ -174,7 +171,7 @@ class PillUpdate(UpdateView):
 class PillDelete(DeleteView):
   model = Pill
   success_url = '/pills/'
-  
+
 def signup(request):
   error_message = ''
   flag = 0
