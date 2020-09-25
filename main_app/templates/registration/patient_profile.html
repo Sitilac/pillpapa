@@ -3,14 +3,12 @@
 <div class="container">
   <div class="centeredFormsAdmin">
     <h1 class="h1Forms">Patient Sign Up</h1>
-
     <form method="post"">
       {% csrf_token %}
       {{ user_form.as_p }}
       {{ profile_form.as_p }}
       <input type="submit" class="btn" value="signup">
     </form>
-
     <script>
       const dateEl = document.getElementById('id_dob');
       M.Datepicker.init(dateEl, {
@@ -21,5 +19,4 @@
     </script>
   </div>
 </div>
-
 {% endblock %}

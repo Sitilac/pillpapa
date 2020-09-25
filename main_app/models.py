@@ -8,14 +8,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
 
-# Create your models here.
-
-# DOSE = (
-#   ('M', 'Morning'),
-#   ('A', 'Afternoon'),
-#   ('N', 'Night')
-# )
-
 class User(AbstractUser):
   first_name = models.CharField(max_length=25, verbose_name='First Name')
   last_name = models.CharField(max_length=25, verbose_name='Last Name')
@@ -27,7 +19,7 @@ class User(AbstractUser):
   @property
   def name(self):
     return "%s %s" % ( self.first_name, self.last_name )
-  
+ 
   def __str__(self):
     return self.name  
 
@@ -40,29 +32,29 @@ class PatientProfile(models.Model):
   @property
   def name(self):
     return "%s %s" % ( self.user.first_name, self.user.last_name )
-  
+ 
   def __str__(self):
     return self.name
-  
+ 
 class AdminProfile(models.Model):
   user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, related_name='admin_profile')
   job_title = models.CharField(max_length=50, verbose_name='Job Title')
   patients_list = models.ManyToManyField(PatientProfile, blank=True)
-  
+ 
   @property
   def name(self):
     return "%s %s" % ( self.user.first_name, self.user.last_name )
-  
+ 
   def __str__(self):
     return self.name
-  
+ 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
   if instance.is_patient:
     PatientProfile.objects.get_or_create(user=instance)
   else:
     AdminProfile.objects.get_or_create(user=instance)
-    
+
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
   if instance.is_patient:
@@ -82,40 +74,38 @@ class Pill(models.Model):
   doses_taken = models.IntegerField(default=1)
   dose_date = models.DateField(default= datetime.now)
   dose_date_switch = models.IntegerField(default=0)
-  qty_remaining = models.IntegerField(default=273)
-  
+  qty_remaining = models.IntegerField(default=273) 
   user = models.ForeignKey(User, on_delete=models.CASCADE)
   patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE)
 
   def __str__(self):
     return self.name
-  
+
   def get_absolute_url(self):
     return reverse('detail', kwargs={'pill_id': self.id})
-  
+ 
   def dose_on_time(self):
     dose_on = self.dosing_total - self.doses_taken
     d = Dosing.objects.filter(pill_id = self.id)
     return d[dose_on]
-    
-  
+
 class EmergencyContact(models.Model):
   first_name = models.CharField(max_length=50, verbose_name='First Name')
   last_name = models.CharField(max_length=50, verbose_name='Last Name')
   phone = models.CharField(max_length=25, verbose_name='Phone Number')
   email = models.CharField(max_length=75, verbose_name='Email Address')
   patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE, null=True)
-  
+
   @property
   def name(self):
     return "%s %s" % ( self.first_name, self.last_name )
-  
+
   def __str__(self):
     return self.name
-  
+
   def get_absolute_url(self):
     return reverse('patients_profile')
-  
+
 class Dosing(models.Model):
   time = models.TimeField()
   dose = models.IntegerField()
@@ -127,13 +117,13 @@ class Dosing(models.Model):
 class PatientPhoto(models.Model):
   url = models.CharField(max_length=200)
   patient = models.ForeignKey(PatientProfile, on_delete=models.CASCADE)
-  
+
   def __str__(self):
     return f"Photo for patient: @{self.url}"
 
 class AdminPhoto(models.Model):
   url = models.CharField(max_length=200)
   admin = models.ForeignKey(AdminProfile, on_delete=models.CASCADE)
-  
+
   def __str__(self):
     return f"Photo for admin: @{self.url}"
