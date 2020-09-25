@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% block content %}
-
 <div class="container">
   <h1>{{user.name}}'s Profile</h1>
   <div class="row">
@@ -28,10 +27,9 @@
               <p>&nbsp;&nbsp;Phone: {{patient.emergencycontact_set.first.phone}}</p>
               <p>&nbsp;&nbsp;Email: {{patient.emergencycontact_set.first.email}}</p>
             </a>
-          {% empty %}
-            <div class="card-panel red-text center-align">{{ admin.name }} Has Not Yet Added Any Patients</div>
-            <!-- <a href="{% url 'pills_create' %}">Add Pills</a> -->
-        {% endfor %}
+            {% empty %}
+              <div class="card-panel red-text center-align">{{ admin.name }} Has Not Yet Added Any Patients</div>
+           {% endfor %}
         </div>
       </div>
       <div class="card-action">
@@ -52,5 +50,4 @@
     </div>
   </div>
 </div>
-
 {% endblock %}

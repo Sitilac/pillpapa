@@ -3,7 +3,6 @@
 <div class="container">
   <div class="centeredFormsSign">
     <h1 class="h1Forms">Log In</h1>
-
     <form method="post" action="{% url 'login' %}">
       {% csrf_token %}
       {{ form.as_p }}
@@ -12,5 +11,4 @@
     </form>
   </div>
 </div>
-
 {% endblock %}
