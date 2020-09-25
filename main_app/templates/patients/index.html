@@ -1,8 +1,6 @@
 {% extends 'base.html' %} 
 {% block content %}
-
 <h1>Patient List</h1>
-
 {% for patient in patients %}
 <div class="card">
   <a href="{% url 'patients_detail' patient.id %}">
@@ -20,5 +18,4 @@
   {% endif %}
 </div>
 {% endfor %} 
-
 {% endblock %}
