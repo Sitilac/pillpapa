@@ -245,7 +245,6 @@ main img.homebackground {
   transition: 0.5s all;
   opacity: 0;
   border-radius: 50%;
-
 }
 
 .cardHome:hover::before {

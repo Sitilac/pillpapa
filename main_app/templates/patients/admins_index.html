@@ -1,9 +1,7 @@
 {% extends 'base.html' %} 
 {% block content %}
-
 <div class="container">
   <h1>{{ user.name }}'s Patient List</h1>
-
   {% for patient in patients %}
   <div class="card">
     <a href="{% url 'patients_detail' patient.id %}">
