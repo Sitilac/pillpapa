@@ -48,13 +48,29 @@ def pill_detail(request, pill_id):
 def dose_taken(request, pill_id):
   pill = Pill.objects.get(id=pill_id)
   dosing = Dosing.objects.filter(pill_id=pill_id)
-  if(pill.qty != pill.qty_remaining and pill.qty_remaining > pill.qty):
+
+  time = datetime.now()
+  time = time.time()
+  time = int(time.strftime('%H'))
+  if(pill.qty != pill.qty_remaining and pill.qty_remaining > pill.qty ):
     pill.qty_remaining = pill.qty
     pill.save(update_fields=['qty_remaining'])
   idx = pill.dosing_total - pill.doses_taken
+  time2 = dosing[idx].time
+  time2 = int(time2.strftime('%H'))
+  compare_time = time - time2
+  if compare_time < 0:
+    compare_time = compare_time * (-1)
+  if compare_time <= 1:
+    request.user.patient_profile.points += 100
+  elif compare_time > 1 and compare_time < 2:
+    request.user.patient_profile.points += 50
+  else:
+    pass
   pill.doses_taken = pill.doses_taken + 1
   pill.qty_remaining = pill.qty_remaining - dosing[idx].dose
-  pill.save(update_fields=['doses_taken', 'qty_remaining'])
+  pill.save(update_fields=['doses_taken','qty_remaining'])
+  request.user.patient_profile.save(update_fields=['points'])
   return redirect('detail', pill_id=pill_id)
 
 def add_dosing(request, pill_id):
