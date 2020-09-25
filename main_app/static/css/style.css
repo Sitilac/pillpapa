@@ -63,29 +63,36 @@ div.sub-full-bleed.remove-padding {
   border-radius: 18px;
   font-size: 20px;
   display: grid;
-  grid-template-columns: 500px;
-  grid-template-rows: 140px;
+  grid-template-columns: 20em;
+  grid-template-rows: 1em;
   padding-left: 100px;
   padding-right: 100px;
 }
 
 .centeredFormsAdmin {
   position: absolute;
-  top: 30%;
+  top: 35%;
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: whitesmoke;
   box-shadow: 5px 5px 15px rgba(0,0,0,0.9);
   border-radius: 18px;
-  font-size: 10px;
+  font-size: 2px;
   display: grid;
-  grid-template-columns: 500px;
-  grid-template-rows: 90px;
-  padding-left: 100px;
-  padding-right: 100px;
-  margin-top: 22vh;
-}
+  grid-template-columns: 60vh;
+  grid-template-rows: 1em;
+  margin-top: 20vh;
+  line-height: 1%;
+  object-fit: cover;
+  padding-top: 10%;
 
+  /* margin-top: 20vh; */
+}
+.formsSignUp {
+  margin-left: 20%;
+  margin-right:20%;
+  margin-bottom: 10%;
+}
 .centeredFormsSign {
   position: absolute;
   top: 20%;
@@ -134,8 +141,18 @@ div.sub-full-bleed.remove-padding {
  text-align: center;
  color: #A4A9B8;
  font-weight: bold;
- margin: 5px;
 }
+.profileHeader {
+  color: #A4A9B8;
+  font-weight: bold;
+ }
+ .hTagProfile {
+  color: #A4A9B8;
+  font-weight: bold;
+  font-size: 30px;
+ }
+
+
 
 .h1FormsIndex {
  text-align: center;
