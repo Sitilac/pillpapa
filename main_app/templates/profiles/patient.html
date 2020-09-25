@@ -2,33 +2,56 @@
 {% block content %}
 
 <div class="container">
-  <h1>Patient Details</h1>
+  <h1>{{user.name}}'s Profile</h1>
   <div class="row">
     <div class="col s6">
       <div class="card">
         <div class="card-content">
-          <span class="card-title">{{ patient.name}}</span>
           {% if patient.patient_photo_set.last %}
             <img class="responsive-img card-panel" src="{{patient.patient_photo_set.last.url}}">
+          {% else %}
+            <div class="card-panel red-text center-align">No Photos Uploaded</div>
           {% endif %}
-          <p>Email: {{ patient.user.email }}</p>
-          <p>Phone: {{ patient.user.phone }}</p>
+          <p>Email: {{ user.email }}</p>
+          <p>Phone: {{ user.phone }}</p>
           <p>Date of Birth: {{ patient.dob }}</p>
+          {% if patient.room_number %}
           <p>Room Number: {{ patient.room_number }}</p>
+          {% endif %}
+          {% if patient.points > 0 %}
           <p>Points: {{ patient.points }}</p>
+          {% endif %}
           <h2>Emergency Contact Info</h2>
           <p>{{ICE.name}}</p>
           <p>{{ICE.phone}}</p>
           <p>{{ICE.email}}</p>
           <h2>{{ patient.name }}'s Pills</h2>
           {% for pill in patient.pill_set.all %}
+          <a href="{% url 'detail' pill.id %}">
             <p>Name: {{ pill.name }}</p>
             <p>Dosage: {{ pill.dosage }}</p>
             <p>Refills: {{ pill.refills }}</p>
             <p>Quantity Remaining: {{ pill.qty_remaining }}</p>
+          </a>
           {% empty %}
             <div class="card-panel red-text center-align">{{ patient.name }} Has Not Yet Added Any Pills</div>
+          {% endfor %} <br>
+          <a href="{% url 'pills_create' %}">Add Pills</a>
+        </div>
+      </div>
+      <div class="card-action">
+        <h2>{{ patient.name }}'s Photos</h2>
+          {% for photo in patient.patient_photo_set.all %}
+          <img class="responsive-img card-panel" src="{{photo.url}}">
+          {% empty %}
+          <div class="card-panel red-text center-align">No Photos Uploaded</div>
           {% endfor %}
+          <form action="{% url 'add_patient_photo' %}" enctype="multipart/form-data" method="POST" class="card-panel">
+            {% csrf_token %}
+            <input type="file" name="photo-file">
+            <br><br>
+            <input type="submit" class="btn" value="Upload Photo">
+          </form>
         </div>
       </div>
     </div>

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<form class="form-horizontal" method="POST" action="">
+  {% csrf_token %}
+  {{ formset.management_form }}
+  <div id="form_set">
+  {% for form in formset %}
+    <table class='no_error'>
+        {{form.as_table}}
+    </table>
+  </div>
+  {% endfor %}
+  <button type="submit" class="btn btn-block btn-primary">Submit</button>
+  </form>
+  <input type="button" value="Add More" id="add_more">
+  <div id="empty_form" style="display:none">
+    <table class='no_error'>
+        {{ formset.empty_form.as_table }}
+    </table>
+</div>
+</div>
+<script>
+ $('#add_more').click(function() {
+        var form_idx = $('#id_form-TOTAL_FORMS').val();
+        $('#form_set').append($('#empty_form').html().replace(/__prefix__/g, form_idx));
+        $('#id_form-TOTAL_FORMS').val(parseInt(form_idx) + 1);
+});
+ 
+</script>
+
+{% endblock %}
