@@ -102,7 +102,7 @@ class Migration(migrations.Migration):
         ('pill', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main_app.pill')),
       ],
       options={
-        'ordering': ['time'],
+        'ordering': ['-time'],
       },
     ),
     migrations.CreateModel(

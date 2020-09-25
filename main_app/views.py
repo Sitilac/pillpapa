@@ -199,10 +199,10 @@ def add_patient_photo(request):
     try:
       s3.upload_fileobj(photo_file, BUCKET, key)
       url = f"{S3_BASE_URL}{BUCKET}/{key}"
-      PatientPhoto.objects.create(url=url)
+      PatientPhoto.objects.create(url=url, patient_id=request.user.patient_profile.id)
     except:
       print('An error occurred uploading file to S3')
-  return redirect('patients_profile', kwargs={'patient_id': request.user.patient_profile.id})
+  return redirect('patients_profile')
 
 def add_admin_photo(request):
   photo_file = request.FILES.get('photo-file', None)
@@ -212,10 +212,10 @@ def add_admin_photo(request):
     try:
       s3.upload_fileobj(photo_file, BUCKET, key)
       url = f"{S3_BASE_URL}{BUCKET}/{key}"
-      AdminPhoto.objects.create(url=url)
+      AdminPhoto.objects.create(url=url, admin_id=request.user.admin_profile.id)
     except:
       print('An error occurred uploading file to S3')
-  return redirect('admins_profile', kwargs={'admin_id': request.user.admin_profile.id})
+  return redirect('admins_profile')
 
 @transaction.atomic
 def patient_profile_view(request):

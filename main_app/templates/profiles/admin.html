@@ -6,8 +6,8 @@
     <div class="col s6">
       <div class="card">
         <div class="card-content">
-          {% if admin.admin_photo_set.last %}
-            <img class="responsive-img card-panel" src="{{admin.admin_photo_set.last.url}}">
+          {% if admin.adminphoto_set.last %}
+            <img class="responsive-img card-panel" src="{{admin.adminphoto_set.last.url}}">
           {% else %}
             <div class="card-panel red-text center-align">No Photos Uploaded</div>
           {% endif %}
@@ -34,7 +34,7 @@
       </div>
       <div class="card-action">
         <h2 class="hTagProfile">{{ admin.name }}'s Photos</h2>
-          {% for photo in admin.admin_photo_set.all %}
+          {% for photo in admin.adminphoto_set.all %}
           <img class="responsive-img card-panel" src="{{photo.url}}">
           {% empty %}
           <div class="card-panel red-text center-align">No Photos Uploaded</div>
