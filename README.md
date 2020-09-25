@@ -23,5 +23,5 @@
 ### https://trello.com/b/FHJ9L9kM/pill-papa-remote-team-hub
 
 ## Next Steps:
-* We have a lot of code that has been commented out in the meantime due to time constraints so we will definetely come back to the project to implement image text scraper capabilities, finalize the gamification of the app, and finalize the notifications for admins and patients to increase the productivity of the app.
+* We have a lot of ideas we we not able to implement due to time constraints so we will definetely come back to the project to implement image text scraper capabilities, finalize the gamification of the app, sorting the patient index page, adding a Facilities model to add further functionality to groups and adminoversight, and finalize the notifications for admins and patients to increase the productivity of the app.
 * There was a lot of styling that was done as well but when resizing on smaller screens it was noticed that certain things were not as responsive as one originally believed them to be. We will come back to optimize the user experience with better styling.
