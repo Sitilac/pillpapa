@@ -142,6 +142,16 @@ div.sub-full-bleed.remove-padding {
  color: #A4A9B8;
  font-weight: bold;
 }
+.profileHeader {
+  color: #A4A9B8;
+  font-weight: bold;
+ }
+ .hTagProfile {
+  color: #A4A9B8;
+  font-weight: bold;
+  font-size: 30px;
+ }
+
 
 
 .h1FormsIndex {
