@@ -1,5 +1,4 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,13 +20,11 @@
           <li><a href="/" class="left brand-logo"><img class= "papalogo" src="https://i.imgur.com/RgyzgDH.png" alt="Pill Papa logo"></a></li>
         </ul>
         <ul class="right">
-          <li><a href="{% url 'about' %}">About</a></li>
           {% if user.is_authenticated %}
             {% if user.is_admin %}
               <li><a href="{% url 'admins_profile' %}">View Profile</a></li>
               <li><a href="{% url 'patients_index' %}">View All Patients</a></li>
               <li><a href="{% url 'patients_admins_index' %}">View My Patients</a></li>
-              <!-- <li><a href="{% url 'patient_create' %}">Create New Patient</a></li> -->
             {% endif %}
             {% if user.is_patient %}
               <li><a href="{% url 'patients_profile' %}">View Profile</a></li>

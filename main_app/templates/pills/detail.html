@@ -2,7 +2,6 @@
 {% block content %}
 <div class="container">
 <h1>Pill Details</h1>
-
 <div class="row">
   <div class="col s6">
     <div class="card">
@@ -24,13 +23,12 @@
 </div>
 <div class="col s6">
   <a href="{% url 'add_dosing' pill.id %}">Create Dosing Directions</a>
-  <!-- new code above -->
-{% if time.time > pill.dose_on_time.time %}
-<h6>You are late in taking your pills from {{pill.dose_on_time.time}}</h6>
-{% endif %}
-{% if pill.dosing_total == pill.doses_taken %}
-  <br><a href="{% url 'dose_taken' pill.id %}">Mark Dose Taken</a>
-{% endif %}
+  {% if time.time > pill.dose_on_time.time %}
+    <h6>You are late in taking your pills from {{pill.dose_on_time.time}}</h6>
+  {% endif %}
+  {% if pill.dosing_total == pill.doses_taken %}
+    <br><a href="{% url 'dose_taken' pill.id %}">Mark Dose Taken</a>
+  {% endif %}
   <table class="striped">
     <thead>
       <tr><th>Date</th><th>Dose</th></tr>
@@ -48,9 +46,6 @@
 </div>
 <script>
   const dateEl = document.getElementById('id_form-0-date');
-//   $(function () {
-//     $('id_date').datetimepicker();
-//  });
   M.Datepicker.init(dateEl, {
     format: 'yyyy-mm-dd',
     defaultDate: new Date(),

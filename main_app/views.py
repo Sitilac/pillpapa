@@ -32,32 +32,29 @@ def pills_index(request):
 def pill_detail(request, pill_id):
   pill = Pill.objects.get(id=pill_id)
   time = datetime.now()
-  #Make sure pill dosing total is up to date
-  d = Dosing.objects.filter(pill_id = pill_id)
+  d = Dosing.objects.filter(pill_id=pill_id)
   dosing_count = d.count()
   pill.dosing_total = dosing_count
   pill.save(update_fields=['dosing_total'])
   if(pill.dose_date != date.today()):
     pill.dose_date = date.today()
     pill.doses_taken = 1
-    pill.save(update_fields=['doses_taken','dose_date'])
-  
+    pill.save(update_fields=['doses_taken', 'dose_date'])
   dosing_form = DosingForm()
   return render(request, 'pills/detail.html', {
-     'pill': pill, 'dosing_form':dosing_form, "dosing": d,"time":time
+     'pill': pill, 'dosing_form': dosing_form, 'dosing': d, 'time': time
   })
-  
+
 def dose_taken(request, pill_id):
   pill = Pill.objects.get(id=pill_id)
   dosing = Dosing.objects.filter(pill_id=pill_id)
+
   time = datetime.now()
   time = time.time()
   time = int(time.strftime('%H'))
-  
   if(pill.qty != pill.qty_remaining and pill.qty_remaining > pill.qty ):
     pill.qty_remaining = pill.qty
     pill.save(update_fields=['qty_remaining'])
-    
   idx = pill.dosing_total - pill.doses_taken
   time2 = dosing[idx].time
   time2 = int(time2.strftime('%H'))
@@ -70,14 +67,10 @@ def dose_taken(request, pill_id):
     request.user.patient_profile.points += 50
   else:
     pass
-    
   pill.doses_taken = pill.doses_taken + 1
   pill.qty_remaining = pill.qty_remaining - dosing[idx].dose
-  
-  
   pill.save(update_fields=['doses_taken','qty_remaining'])
   request.user.patient_profile.save(update_fields=['points'])
-  
   return redirect('detail', pill_id=pill_id)
 
 def add_dosing(request, pill_id):
@@ -94,12 +87,11 @@ def add_dosing(request, pill_id):
           new_dosing.pill_id = pill_id
           new_dosing.save()
       return redirect('detail', pill_id=pill_id)
-
   context = {
     'formset': formset,
   }
-  return render(request, "dosing/dosing.html", context)
-  
+  return render(request, 'dosing/dosing.html', context)
+
 def patients_index(request):
   patients = PatientProfile.objects.all
   admins_patients = request.user.admin_profile.patients_list.all()
@@ -111,7 +103,7 @@ def patients_index(request):
 def patients_admins_index(request):
   patients = request.user.admin_profile.patients_list.all()
   return render(request, 'patients/admins_index.html', { 'patients': patients })
-  
+
 def add_patient(request, patient_id):
   patient = PatientProfile.objects.get(id=patient_id)
   admin = request.user.admin_profile
@@ -139,24 +131,20 @@ def patients_profile(request):
 
 def admins_profile(request): 
   admin = request.user.admin_profile
-  # patients = PatientProfile.objects.get()
   return render(request, 'profiles/admin.html',{
     'admin':admin, 
-    # 'patients':patients,
   })
 
 class PatientCreate(CreateView):
   model = PatientProfile
-  fields = ["first_name", "last_name", "email", 'dob', 'phone', 'room_number']
+  fields = ['first_name', 'last_name', 'email', 'dob', 'phone', 'room_number']
   
   def form_valid(self, form):
-    # Assign the logged in user (self.request.user)
     form.instance.user = self.request.user
     form.instance.patient_profile = self.request.user.patient_profile
     self.request.user.first_name = form.instance.user.first_name
     self.request.user.last_name = form.instance.user.last_name
     self.request.user.email = form.instance.user.email
-    # Let the CreateView do its job as usual
     return super().form_valid(form)
 
 class ICECreate(CreateView):
@@ -164,15 +152,13 @@ class ICECreate(CreateView):
   fields = ['first_name', 'last_name', 'email', 'phone']
   
   def form_valid(self, form):
-    # Assign the logged in user (self.request.user)
     form.instance.user = self.request.user
     form.instance.patient = self.request.user.patient_profile
-    # Let the CreateView do its job as usual
     return super().form_valid(form)
-  
+
 class PillCreate(CreateView):
   model = Pill
-  fields = ['name','dosage','directions', 'prescribing_doctor','qty','refills', 'date_prescribed']
+  fields = ['name', 'dosage', 'directions', 'prescribing_doctor', 'qty', 'refills', 'date_prescribed']
 
   def form_valid(self, form):
     # Assign the logged in user (self.request.user)
@@ -193,21 +179,15 @@ def signup(request):
   error_message = ''
   flag = 0
   if request.method == 'POST':
-    # This is how to create a 'user' form object
-    # that includes the data from the browser
     form = UserCreationForm(request.POST)
     if form.is_valid(): 
       user = form.save()
-      # This will add the user to the database
-      # This is how we log a user in via code
       login(request, user)
       return redirect('patient_create')
     else:
       error_message = 'Invalid sign up - try again'
-  # A bad POST or a GET request, so render signup.html with an empty form
   form = UserCreationForm()
   patient = PatientProfileForm()
-  #emergency_contact = ICEForm()
   context = {
     'form': form, 
     'error_message': error_message,
