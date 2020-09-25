@@ -127,7 +127,7 @@ class Dosing(models.Model):
   pill = models.ForeignKey(Pill, on_delete=models.CASCADE)
 
   class Meta:
-    ordering = ['-time']
+    ordering = ['time']
 
 class PatientPhoto(models.Model):
   url = models.CharField(max_length=200)
